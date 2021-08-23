@@ -6,23 +6,33 @@ import AlertDialog from "./AlertDialog";
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/Edit';
 import AddIcon from '@material-ui/icons/Add';
+import FormDialog from "./FormDialog";
 
 class Tasks extends Component {
     constructor(props) {
         super(props);
         this.state = {
             viewCompleted: false,
-            open: false,
+            alertOpen: false,
+            formOpen: false,
             taskId: 0,
         };
     }
 
-    handleClickOpen = (item) => {
-        this.setState({ open: true, taskId: item.id });
+    handleAlertOpen = (item) => {
+        this.setState({ alertOpen: true, taskId: item.id });
     };
 
-    handleClose = () => {
-        this.setState({ open: false });
+    handleAlertClose = () => {
+        this.setState({ alertOpen: false });
+    };
+
+    handleFormOpen = (item) => {
+        this.setState({ formOpen: true });
+    };
+
+    handleFormClose = () => {
+        this.setState({ formOpen: false });
     };
 
     displayCompleted = (status) => {
@@ -88,7 +98,7 @@ class Tasks extends Component {
                     <button className="btn btn-secondary mr-2">
                         <EditIcon />
                     </button>
-                    <button className="btn btn-danger" onClick={() => this.handleClickOpen(item)}>
+                    <button className="btn btn-danger" onClick={() => this.handleAlertOpen(item)}>
                         <DeleteOutlineIcon />
                     </button>
                 </span>
@@ -109,7 +119,10 @@ class Tasks extends Component {
                             </ul>
                             <br />
                             <div className="mb-4">
-                                <button className={this.state.viewCompleted ? "btn btn-success hidden" : "btn btn-success"} >
+                                <button
+                                    className={this.state.viewCompleted ? "btn btn-success hidden" : "btn btn-success"}
+                                    onClick={() => this.handleFormOpen()}
+                                >
                                     <AddIcon />
                                 </button>
                             </div>
@@ -117,11 +130,17 @@ class Tasks extends Component {
                     </div>
                 </div>
                 <AlertDialog
-                    open={this.state.open}
-                    handleClose={this.handleClose}
+                    open={this.state.alertOpen}
+                    handleClose={this.handleAlertClose}
                     handleSubmit={this.handleDelete}
                     title="This task will be deleted."
                     desc="This action cannot be undone."
+                />
+                <FormDialog
+                    open={this.state.formOpen}
+                    handleClose={this.handleFormClose}
+                    handleSubmit={() => {}}
+                    title="Add a New Task"
                 />
             </main>
         );

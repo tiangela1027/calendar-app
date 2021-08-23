@@ -24,7 +24,7 @@ export default function AlertDialog({ open, handleClose, handleSubmit, title, de
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
-            Close
+            Cancel
           </Button>
           <Button onClick={handleSubmit} color="secondary" autoFocus>
             Confirm
