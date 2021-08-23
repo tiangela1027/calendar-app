@@ -1,0 +1,19 @@
+{% if latest_tasks_list %}
+    <ul>
+    {% for task in latest_tasks_list %}
+        <li><a href="{% url 'cal:details' task.id %}">{{ task.title }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No tasks are in progress.</p>
+{% endif %}
+
+<form action="{% url 'cal:create' %}" method="post">
+{% csrf_token %}
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+<input type="text" name="title" id="task">
+<label for="task">New Task</label><br>
+<input type="text" name="description" id="description">
+<label for="description}">Description</label><br>
+<input type="submit" value="Create">
+</form>

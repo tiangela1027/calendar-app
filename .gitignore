@@ -1,0 +1,4 @@
+calendarapp/cal/__pycache__/
+calendarapp/db.sqlite3
+frontend/node_modules
+venv/
