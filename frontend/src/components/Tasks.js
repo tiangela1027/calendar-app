@@ -1,6 +1,11 @@
 import axios from "axios";
 import React, { Component } from "react";
 import { getCookie } from "./CSRFToken";
+import AlertDialog from "./AlertDialog";
+
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
+import EditIcon from '@material-ui/icons/Edit';
+import AddIcon from '@material-ui/icons/Add';
 
 class Tasks extends Component {
     constructor(props) {
@@ -8,11 +13,12 @@ class Tasks extends Component {
         this.state = {
             viewCompleted: false,
             open: false,
+            taskId: 0,
         };
     }
 
-    handleClickOpen = () => {
-        this.setState({ open: true });
+    handleClickOpen = (item) => {
+        this.setState({ open: true, taskId: item.id });
     };
 
     handleClose = () => {
@@ -46,9 +52,9 @@ class Tasks extends Component {
         );
     };
 
-    handleDelete = (item) => {
+    handleDelete = () => {
         axios
-            .delete(`/api/tasks/${item.id}/`,
+            .delete(`/api/tasks/${this.state.taskId}/`,
                 {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
@@ -80,10 +86,10 @@ class Tasks extends Component {
                 <small>{item.description}</small>
                 <span>
                     <button className="btn btn-secondary mr-2">
-                        Edit
+                        <EditIcon />
                     </button>
-                    <button className="btn btn-danger" onClick={() => this.handleDelete(item)}>
-                        Delete
+                    <button className="btn btn-danger" onClick={() => this.handleClickOpen(item)}>
+                        <DeleteOutlineIcon />
                     </button>
                 </span>
             </li>
@@ -103,13 +109,20 @@ class Tasks extends Component {
                             </ul>
                             <br />
                             <div className="mb-4">
-                                <button className={this.state.viewCompleted ? "btn btn-primary hidden" : "btn btn-primary"} >
-                                    Add task
+                                <button className={this.state.viewCompleted ? "btn btn-success hidden" : "btn btn-success"} >
+                                    <AddIcon />
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+                <AlertDialog
+                    open={this.state.open}
+                    handleClose={this.handleClose}
+                    handleSubmit={this.handleDelete}
+                    title="This task will be deleted."
+                    desc="This action cannot be undone."
+                />
             </main>
         );
     }

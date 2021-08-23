@@ -37,17 +37,6 @@ def create(request):
     new_description.save()
     return render(request, 'cal/index.html', render_all_tasks())
 
-# @api_view(['DELETE'])
-# def delete(request, task_id):
-#     try:
-#         task = Task.objects.get(pk=task_id)
-#     except Task.DoesNotExist:
-#         return HttpResponse(status=404)
-
-#     task.delete()
-#     return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 # helpers
 
 def render_all_tasks():
