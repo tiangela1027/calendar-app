@@ -1,9 +1,9 @@
 import React from 'react';
 import jQuery from 'jquery';
 
-let csrftoken = getCookie('csrftoken');
+export const csrftoken = getCookie('csrftoken');
 
-export function getCookie(name) {
+function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
         let cookies = document.cookie.split(';');

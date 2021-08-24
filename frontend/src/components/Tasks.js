@@ -1,13 +1,14 @@
 import axios from "axios";
 import React, { Component } from "react";
-import { getCookie } from "./CSRFToken";
+import { csrftoken } from "./CSRFToken";
 import AlertDialog from "./AlertDialog";
+import FormDialog from "./FormDialog";
 
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/Edit';
 import AddIcon from '@material-ui/icons/Add';
-import FormDialog from "./FormDialog";
-
+import CheckIcon from '@material-ui/icons/Check';
+import RemoveIcon from '@material-ui/icons/Remove';
 class Tasks extends Component {
     constructor(props) {
         super(props);
@@ -16,6 +17,8 @@ class Tasks extends Component {
             alertOpen: false,
             formOpen: false,
             taskId: 0,
+            postTitle: "",
+            postDescription: "",
         };
     }
 
@@ -43,6 +46,31 @@ class Tasks extends Component {
         return this.setState({ viewCompleted: false });
     };
 
+    handleDeleteTask = () => {
+        axios
+            .delete(`/api/tasks/${this.state.taskId}/`,
+                {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrftoken
+                    }
+                }
+            )
+            .then((res) => window.location.reload());
+    }
+
+    handleMarkComplete = (item) => {
+        axios
+            .get(`/calendar/${item.id}/markComplete/`)
+            .then((res) => window.location.reload());
+    }
+
+    handleMarkIncomplete = (item) => {
+        axios
+            .get(`/calendar/${item.id}/markIncomplete/`)
+            .then((res) => window.location.reload());
+    }
+
     renderTabList = () => {
         return (
             <div className="nav nav-tabs">
@@ -61,19 +89,6 @@ class Tasks extends Component {
             </div>
         );
     };
-
-    handleDelete = () => {
-        axios
-            .delete(`/api/tasks/${this.state.taskId}/`,
-                {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRFToken': `${getCookie('csrftoken')}`
-                    }
-                }
-            )
-            .then((res) => window.location.reload());
-    }
 
     renderItems = () => {
         const { viewCompleted } = this.state;
@@ -95,10 +110,28 @@ class Tasks extends Component {
                 </span>
                 <small>{item.description}</small>
                 <span>
+                    <button
+                        className={!this.state.viewCompleted ? "btn btn-warning mr-2 hidden" : "btn btn-warning mr-2"}
+                        onClick={() => this.handleMarkIncomplete(item)}
+                        title="Mark incomplete"
+                    >
+                        <RemoveIcon />
+                    </button>
+                    <button
+                        className={this.state.viewCompleted ? "btn btn-success mr-2 hidden" : "btn btn-success mr-2"}
+                        onClick={() => this.handleMarkComplete(item)}
+                        title="Mark complete"
+                    >
+                        <CheckIcon />
+                    </button>
                     <button className="btn btn-secondary mr-2">
                         <EditIcon />
                     </button>
-                    <button className="btn btn-danger" onClick={() => this.handleAlertOpen(item)}>
+                    <button
+                        className="btn btn-danger"
+                        onClick={() => this.handleAlertOpen(item)}
+                        title="Delete task"
+                    >
                         <DeleteOutlineIcon />
                     </button>
                 </span>
@@ -132,14 +165,14 @@ class Tasks extends Component {
                 <AlertDialog
                     open={this.state.alertOpen}
                     handleClose={this.handleAlertClose}
-                    handleSubmit={this.handleDelete}
+                    handleSubmit={this.handleDeleteTask}
                     title="This task will be deleted."
                     desc="This action cannot be undone."
                 />
                 <FormDialog
                     open={this.state.formOpen}
                     handleClose={this.handleFormClose}
-                    handleSubmit={() => {}}
+                    handleSubmit={() => { }}
                     title="Add a New Task"
                 />
             </main>
