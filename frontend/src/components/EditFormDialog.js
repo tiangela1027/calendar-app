@@ -5,8 +5,21 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 
-export default function FormDialog({ open, handleClose, title, postTitle, postDesc, handleEditTask, handleTitleChange, handleDescChange }) {
+export default function FormDialog({
+    open,
+    handleClose,
+    title,
+    postTitle,
+    postDesc,
+    postChecked,
+    handleEditTask,
+    handleTitleChange,
+    handleDescChange,
+    handlePriorityChange
+}) {
 
     return (
         <div>
@@ -31,6 +44,10 @@ export default function FormDialog({ open, handleClose, title, postTitle, postDe
                         type="text"
                         value={postDesc}
                         onChange={handleDescChange}
+                    />
+                    <FormControlLabel
+                        control={<Checkbox checked={postChecked} onChange={handlePriorityChange} name="priority" />}
+                        label="Mark as higher priority"
                     />
                 </DialogContent>
                 <DialogActions>

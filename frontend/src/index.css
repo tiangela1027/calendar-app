@@ -10,6 +10,12 @@ body {
   position: relative;
 }
 
+.urgent {
+  /* padding: 10px; */
+  color: red;
+  font-size: 1.15em;
+}
+
 button {
   margin: 5px;
 }

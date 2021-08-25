@@ -10,6 +10,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import AddIcon from '@material-ui/icons/Add';
 import CheckIcon from '@material-ui/icons/Check';
 import RemoveIcon from '@material-ui/icons/Remove';
+
 class Tasks extends Component {
     constructor(props) {
         super(props);
@@ -21,6 +22,7 @@ class Tasks extends Component {
             taskId: 0,
             postTitle: "",
             postDesc: "",
+            postChecked: false,
             currItem: {}
         };
     }
@@ -49,6 +51,7 @@ class Tasks extends Component {
             currItem: item,
             postTitle: item.title,
             postDesc: item.description,
+            postChecked: item.priority,
             editFormOpen: true
         });
     };
@@ -64,7 +67,8 @@ class Tasks extends Component {
                     title: this.state.postTitle,
                     description: this.state.postDesc,
                     create_date: this.state.currItem.create_date,
-                    completed: this.state.currItem.completed
+                    completed: this.state.currItem.completed,
+                    priority: `${this.state.postChecked ? 1 : 0}`
                 },
                 {
                     headers: {
@@ -82,6 +86,10 @@ class Tasks extends Component {
     handleDescChange = (event) => {
         this.setState({ postDesc: event.target.value });
     }
+
+    handlePriorityChange = (event) => {
+        this.setState({ postChecked: event.target.checked });
+    };
 
     // Other helpers
     displayCompleted = (status) => {
@@ -136,6 +144,12 @@ class Tasks extends Component {
         );
     };
 
+    handleDate = (item) => {
+        let itemDate = item.create_date
+        let parsedDate = new Date(itemDate);
+        return "Made: " + parsedDate.toLocaleDateString() + " | " + parsedDate.toLocaleTimeString();
+    }
+
     renderItems = () => {
         const { viewCompleted } = this.state;
         const newItems = this.props.todoList.filter(
@@ -147,13 +161,19 @@ class Tasks extends Component {
                 key={item.id}
                 className="list-group-item d-flex justify-content-between align-items-center"
             >
-                <span
-                    className={`col-3 todo-title mr-2 ${this.state.viewCompleted ? "completed-todo" : ""}`}
-                    title={item.create_date}
-                >
-                    {item.title}
+                <span className="d-flex col-5">
+                    <span
+                        className={`col-10 todo-title mr-2`}
+                    >
+                        <span className={item.priority ? "urgent" : ""}>{item.title}</span>
+                        <br />
+                        <small>{this.handleDate(item)}</small>
+                    </span>
+                    {/* <span className={`urgent ${!item.priority ? "hidden" : ""}`}>
+                        <PriorityHighIcon color="secondary" />
+                    </span> */}
                 </span>
-                <span className="col-3"><small>{item.description}</small></span>
+                <span className="col-5"><small>{item.description}</small></span>
                 <span className="col-1">
                     <button
                         className={`btn btn-warning sm ${!this.state.viewCompleted ? "hidden" : ""}`}
@@ -193,7 +213,7 @@ class Tasks extends Component {
                 <h1 className="my-4">Tasks</h1>
                 <div className="row">
                     <div className="col-md-12 col-sm-10 mx-auto p-0">
-                        <div className="card p-3">
+                        <div className="card p-3 mb-3">
                             {this.renderTabList()}
                             <ul className="list-group list-group-flush border-top-0">
                                 {this.renderItems()}
@@ -228,9 +248,11 @@ class Tasks extends Component {
                     title="Edit Task"
                     postTitle={this.state.postTitle}
                     postDesc={this.state.postDesc}
+                    postChecked={this.state.postChecked}
                     handleEditTask={this.handleEditTask}
                     handleTitleChange={this.handleTitleChange}
                     handleDescChange={this.handleDescChange}
+                    handlePriorityChange={this.handlePriorityChange}
                 />
             </main>
         );
