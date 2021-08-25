@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import { csrftoken } from "./CSRFToken";
 import AlertDialog from "./AlertDialog";
 import FormDialog from "./FormDialog";
+import EditFormDialog from "./EditFormDialog";
 
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/Edit';
@@ -15,13 +16,16 @@ class Tasks extends Component {
         this.state = {
             viewCompleted: false,
             alertOpen: false,
-            formOpen: false,
+            addFormOpen: false,
+            editFormOpen: false,
             taskId: 0,
             postTitle: "",
-            postDescription: "",
+            postDesc: "",
+            currItem: {}
         };
     }
 
+    // Delete dialog helpers
     handleAlertOpen = (item) => {
         this.setState({ alertOpen: true, taskId: item.id });
     };
@@ -30,14 +34,56 @@ class Tasks extends Component {
         this.setState({ alertOpen: false });
     };
 
-    handleFormOpen = (item) => {
-        this.setState({ formOpen: true });
+    // Add dialog helpers
+    handleAddFormOpen = (item) => {
+        this.setState({ addFormOpen: true });
     };
 
-    handleFormClose = () => {
-        this.setState({ formOpen: false });
+    handleAddFormClose = () => {
+        this.setState({ addFormOpen: false });
     };
 
+    // Edit dialog helpers
+    handleEditFormOpen = (item) => {
+        this.setState({
+            currItem: item,
+            postTitle: item.title,
+            postDesc: item.description,
+            editFormOpen: true
+        });
+    };
+
+    handleEditFormClose = () => {
+        this.setState({ editFormOpen: false });
+    };
+
+    handleEditTask = () => {
+        axios
+            .put(`/api/tasks/${this.state.currItem.id}/`,
+                {
+                    title: this.state.postTitle,
+                    description: this.state.postDesc,
+                    create_date: this.state.currItem.create_date,
+                    completed: this.state.currItem.completed
+                },
+                {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrftoken,
+                    }
+                }
+            ).then((res) => window.location.reload());
+    }
+
+    handleTitleChange = (event) => {
+        this.setState({ postTitle: event.target.value })
+    }
+
+    handleDescChange = (event) => {
+        this.setState({ postDesc: event.target.value });
+    }
+
+    // Other helpers
     displayCompleted = (status) => {
         if (status) {
             return this.setState({ viewCompleted: true });
@@ -124,7 +170,10 @@ class Tasks extends Component {
                     >
                         <CheckIcon />
                     </button>
-                    <button className="btn btn-secondary mr-2">
+                    <button
+                        className={this.state.viewCompleted ? "btn btn-secondary mr-2 hidden" : "btn btn-secondary mr-2"}
+                        onClick={() => this.handleEditFormOpen(item)}
+                    >
                         <EditIcon />
                     </button>
                     <button
@@ -154,7 +203,7 @@ class Tasks extends Component {
                             <div className="mb-4">
                                 <button
                                     className={this.state.viewCompleted ? "btn btn-success hidden" : "btn btn-success"}
-                                    onClick={() => this.handleFormOpen()}
+                                    onClick={() => this.handleAddFormOpen()}
                                 >
                                     <AddIcon />
                                 </button>
@@ -170,10 +219,19 @@ class Tasks extends Component {
                     desc="This action cannot be undone."
                 />
                 <FormDialog
-                    open={this.state.formOpen}
-                    handleClose={this.handleFormClose}
-                    handleSubmit={() => { }}
+                    open={this.state.addFormOpen}
+                    handleClose={this.handleAddFormClose}
                     title="Add a New Task"
+                />
+                <EditFormDialog
+                    open={this.state.editFormOpen}
+                    handleClose={this.handleEditFormClose}
+                    title="Edit Task"
+                    postTitle={this.state.postTitle}
+                    postDesc={this.state.postDesc}
+                    handleEditTask={this.handleEditTask}
+                    handleTitleChange={this.handleTitleChange}
+                    handleDescChange={this.handleDescChange}
                 />
             </main>
         );
