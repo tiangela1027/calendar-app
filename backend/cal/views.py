@@ -30,24 +30,9 @@ def results(request, task_id):
     response = "You're looking at the results of task %s."
     return HttpResponse(response % task_id)
 
-def create(request):
-    new_task = Task(
-        title=request.POST['title'],
-        description=request.POST['description'],
-        create_date=timezone.now(),
-        completed=0)
-    new_task.save()
-    return render(request, 'cal/index.html', render_all_tasks())
-
-def mark_complete(request, task_id):
+def change_status(request, task_id, status):
     task = Task.objects.get(pk=task_id)
-    task.completed = 1
-    task.save()
-    return HttpResponse(status=204)
-
-def mark_incomplete(request, task_id):
-    task = Task.objects.get(pk=task_id)
-    task.completed = 0
+    task.completed = status
     task.save()
     return HttpResponse(status=204)
 

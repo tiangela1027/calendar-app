@@ -10,12 +10,13 @@ import EditIcon from '@material-ui/icons/Edit';
 import AddIcon from '@material-ui/icons/Add';
 import CheckIcon from '@material-ui/icons/Check';
 import RemoveIcon from '@material-ui/icons/Remove';
+import CachedIcon from '@material-ui/icons/Cached';
 
 class Tasks extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            viewCompleted: false,
+            viewStatus: 0,
             alertOpen: false,
             addFormOpen: false,
             editFormOpen: false,
@@ -106,11 +107,7 @@ class Tasks extends Component {
 
     // Other helpers
     displayCompleted = (status) => {
-        if (status) {
-            return this.setState({ viewCompleted: true });
-        }
-
-        return this.setState({ viewCompleted: false });
+        return this.setState({ viewStatus: status });
     };
 
     handleDeleteTask = () => {
@@ -126,15 +123,9 @@ class Tasks extends Component {
             .then((res) => window.location.reload());
     }
 
-    handleMarkComplete = (item) => {
+    handleChangeStatus = (item, status) => {
         axios
-            .get(`/calendar/${item.id}/markComplete/`)
-            .then((res) => window.location.reload());
-    }
-
-    handleMarkIncomplete = (item) => {
-        axios
-            .get(`/calendar/${item.id}/markIncomplete/`)
+            .get(`/calendar/${item.id}/changeStatus/${status}`)
             .then((res) => window.location.reload());
     }
 
@@ -142,16 +133,22 @@ class Tasks extends Component {
         return (
             <div className="nav nav-tabs">
                 <span
-                    className={this.state.viewCompleted ? "nav-link active" : "nav-link"}
-                    onClick={() => this.displayCompleted(true)}
+                    className={this.state.viewStatus == 0 ? "nav-link active" : "nav-link"}
+                    onClick={() => this.displayCompleted(0)}
                 >
-                    Complete
+                    On Hold
                 </span>
                 <span
-                    className={this.state.viewCompleted ? "nav-link" : "nav-link active"}
-                    onClick={() => this.displayCompleted(false)}
+                    className={this.state.viewStatus == 1 ? "nav-link active" : "nav-link"}
+                    onClick={() => this.displayCompleted(1)}
                 >
-                    Incomplete
+                    In Progress
+                </span>
+                <span
+                    className={this.state.viewStatus == 2 ? "nav-link active" : "nav-link"}
+                    onClick={() => this.displayCompleted(2)}
+                >
+                    Completed
                 </span>
             </div>
         );
@@ -164,21 +161,21 @@ class Tasks extends Component {
     }
 
     renderItems = () => {
-        const { viewCompleted } = this.state;
+        const { viewStatus } = this.state;
         const newItems = this.props.todoList.filter(
-            (item) => viewCompleted ? item.completed !== 0 : item.completed === 0
+            (item) => viewStatus === item.completed
         );
 
         return newItems.map((item) => (
             <li
                 key={item.id}
-                className="list-group-item d-flex justify-content-between align-items-center"
+                className={`list-group-item d-flex justify-content-between align-items-center ${this.setPriorityStyle(item)}`}
             >
                 <span className="d-flex col-5">
                     <span
                         className={`col-10 todo-title mr-2`}
                     >
-                        <span className={this.setPriorityStyle(item)}>{item.title}</span>
+                        <span>{item.title}</span>
                         <br />
                         <small>{this.handleDate(item)}</small>
                     </span>
@@ -189,21 +186,28 @@ class Tasks extends Component {
                 <span className="col-5"><small>{item.description}</small></span>
                 <span className="col-1">
                     <button
-                        className={`btn btn-warning sm ${!this.state.viewCompleted ? "hidden" : ""}`}
-                        onClick={() => this.handleMarkIncomplete(item)}
-                        title="Mark incomplete"
+                        className={`btn btn-warning sm ${this.state.viewStatus == 2 ? "" : "hidden"}`}
+                        onClick={() => this.handleChangeStatus(item, 0)}
+                        title="Mark on hold"
                     >
                         <RemoveIcon />
                     </button>
                     <button
-                        className={`btn btn-success sm ${this.state.viewCompleted ? "hidden" : ""}`}
-                        onClick={() => this.handleMarkComplete(item)}
+                        className={`btn btn-success sm ${this.state.viewStatus == 1 ? "" : "hidden"}`}
+                        onClick={() => this.handleChangeStatus(item, 2)}
                         title="Mark complete"
                     >
                         <CheckIcon />
                     </button>
                     <button
-                        className={`btn btn-secondary sm ${this.state.viewCompleted ? "hidden" : ""}`}
+                        className={`btn btn-info sm ${this.state.viewStatus == 0 ? "" : "hidden"}`}
+                        onClick={() => this.handleChangeStatus(item, 1)}
+                        title="Mark in progress"
+                    >
+                        <CachedIcon />
+                    </button>
+                    <button
+                        className={`btn btn-secondary sm ${this.state.viewStatus !== 2 ? "" : "hidden"}`}
                         onClick={() => this.handleEditFormOpen(item)}
                     >
                         <EditIcon />
@@ -234,7 +238,7 @@ class Tasks extends Component {
                             <br />
                             <div className="mb-2">
                                 <button
-                                    className={`btn btn-success ${this.state.viewCompleted ? "hidden" : ""}`}
+                                    className={`btn btn-success ${this.state.viewStatus === 0 ? "" : "hidden"}`}
                                     onClick={() => this.handleAddFormOpen()}
                                 >
                                     <AddIcon />
