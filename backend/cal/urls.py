@@ -8,4 +8,5 @@ urlpatterns = [
     path('<int:task_id>/', views.details, name='details'),
     path('<int:task_id>/results/', views.results, name='results'),
     path('<int:task_id>/changeStatus/<int:status>', views.change_status, name='changeStatus'),
+    path('<int:project_id>/changeProjectStatus/<int:status>', views.change_project_status, name='changeProjectStatus'),
 ]

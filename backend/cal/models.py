@@ -4,12 +4,22 @@ from django.db import models
 from django.utils import timezone
 
 # Create your models here.
+class Project(models.Model):
+    title = models.CharField(max_length=200)
+    create_date = models.DateTimeField('Date Created')
+    description = models.CharField(max_length=200)
+    status = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.title
+
 class Task(models.Model):
     title = models.CharField(max_length=200)
     create_date = models.DateTimeField('Date Created')
     description = models.CharField(max_length=200)
-    completed = models.IntegerField(default=0)
+    status = models.IntegerField(default=0)
     priority = models.IntegerField(default=0)
+    project = models.ForeignKey(Project, related_name="tasks", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
@@ -24,4 +34,3 @@ class Details(models.Model):
 
     def __str__(self):
         return self.description
-

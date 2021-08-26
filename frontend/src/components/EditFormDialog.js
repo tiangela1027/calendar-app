@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
@@ -18,15 +20,19 @@ export default function FormDialog({
     postTitle,
     postDesc,
     postPriority,
+    postProject,
     handleEditTask,
     handleTitleChange,
     handleDescChange,
-    handlePriorityChange
+    handlePriorityChange,
+    handleProjectChange,
+    projects
 }) {
 
     const useStyles = makeStyles((theme) => ({
         formControl: {
             marginTop: theme.spacing(1),
+            marginRight: theme.spacing(2),
             minWidth: 120,
         },
         selectEmpty: {
@@ -78,6 +84,23 @@ export default function FormDialog({
                             <MenuItem value="1">Low</MenuItem>
                             <MenuItem value="2">Medium</MenuItem>
                             <MenuItem value="3">High</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <FormControl className={classes.formControl}>
+                        <InputLabel shrink id="demo-simple-select-placeholder-label-label">
+                            Project
+                        </InputLabel>
+                        <Select
+                            labelId="demo-simple-select-placeholder-label-label"
+                            id="demo-simple-select-placeholder-label"
+                            value={postProject}
+                            onChange={handleProjectChange}
+                            displayEmpty
+                            className={classes.selectEmpty}
+                        >
+                            {projects.map(({ id, title, ...rest }) => (
+                                <MenuItem value={id}>{title}</MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                 </DialogContent>

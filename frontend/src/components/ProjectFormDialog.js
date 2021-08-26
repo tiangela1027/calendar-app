@@ -9,15 +9,15 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-export default function FormDialog({ open, handleClose, title }) {
+export default function ProjectFormDialog({ open, handleClose, title }) {
 
     const [postTitle, setPostTitle] = React.useState("");
     const [postDesc, setPostDesc] = React.useState("");
 
-    let handleAddTask = () => {
+    let handleAddProject = () => {
         let date = new Date();
         axios
-            .post(`/api/tasks/`,
+            .post(`/api/projects/`,
                 {
                     title: postTitle,
                     description: postDesc,
@@ -68,7 +68,7 @@ export default function FormDialog({ open, handleClose, title }) {
                     <Button onClick={handleClose} color="primary">
                         Cancel
                     </Button>
-                    <Button onClick={handleAddTask} color="primary">
+                    <Button onClick={handleAddProject} color="primary">
                         Add
                     </Button>
                 </DialogActions>

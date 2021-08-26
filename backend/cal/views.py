@@ -5,8 +5,8 @@ from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 
-from .serializers import TaskSerializer
-from .models import Task, Details
+from .serializers import TaskSerializer, ProjectSerializer
+from .models import Task, Details, Project
 
 # Create your views here.
 def index (request):
@@ -32,8 +32,14 @@ def results(request, task_id):
 
 def change_status(request, task_id, status):
     task = Task.objects.get(pk=task_id)
-    task.completed = status
+    task.status = status
     task.save()
+    return HttpResponse(status=204)
+
+def change_project_status(request, project_id, status):
+    project = Project.objects.get(pk=project_id)
+    project.status = status
+    project.save()
     return HttpResponse(status=204)
 
 # helpers
@@ -59,3 +65,7 @@ def render_all_tasks():
 class TaskView(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
     queryset = Task.objects.all()
+
+class ProjectView(viewsets.ModelViewSet):
+    serializer_class = ProjectSerializer
+    queryset = Project.objects.all()

@@ -20,6 +20,7 @@ from cal import views
 
 router = routers.DefaultRouter()
 router.register(r'tasks', views.TaskView, 'cal')
+router.register(r'projects', views.ProjectView, 'cal')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

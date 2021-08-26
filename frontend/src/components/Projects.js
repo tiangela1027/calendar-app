@@ -2,8 +2,8 @@ import axios from "axios";
 import React, { Component } from "react";
 import { csrftoken } from "./CSRFToken";
 import AlertDialog from "./AlertDialog";
-import FormDialog from "./FormDialog";
-import EditFormDialog from "./EditFormDialog";
+import ProjectFormDialog from "./ProjectFormDialog";
+import EditProjectFormDialog from "./EditProjectFormDialog";
 import { handleDate } from "../helpers/Date";
 
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
@@ -12,8 +12,10 @@ import AddIcon from '@material-ui/icons/Add';
 import CheckIcon from '@material-ui/icons/Check';
 import RemoveIcon from '@material-ui/icons/Remove';
 import CachedIcon from '@material-ui/icons/Cached';
+import AssignmentIcon from '@material-ui/icons/Assignment';
+import { Link } from "react-router-dom";
 
-class Tasks extends Component {
+class Projects extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -21,18 +23,16 @@ class Tasks extends Component {
             alertOpen: false,
             addFormOpen: false,
             editFormOpen: false,
-            taskId: 0,
+            projectId: 0,
             postTitle: "",
             postDesc: "",
-            postPriority: 0,
-            postProject: 0,
             currItem: {},
         };
     }
 
     // Delete dialog helpers
     handleAlertOpen = (item) => {
-        this.setState({ alertOpen: true, taskId: item.id });
+        this.setState({ alertOpen: true, projectId: item.id });
     };
 
     handleAlertClose = () => {
@@ -54,8 +54,6 @@ class Tasks extends Component {
             currItem: item,
             postTitle: item.title,
             postDesc: item.description,
-            postPriority: item.priority,
-            postProject: item.project,
             editFormOpen: true
         });
     };
@@ -64,16 +62,14 @@ class Tasks extends Component {
         this.setState({ editFormOpen: false });
     };
 
-    handleEditTask = () => {
+    handleEditProject = () => {
         axios
-            .put(`/api/tasks/${this.state.currItem.id}/`,
+            .put(`/api/projects/${this.state.currItem.id}/`,
                 {
                     title: this.state.postTitle,
                     description: this.state.postDesc,
                     create_date: this.state.currItem.create_date,
                     status: this.state.currItem.status,
-                    priority: this.state.postPriority,
-                    project: this.state.postProject,
                 },
                 {
                     headers: {
@@ -92,27 +88,6 @@ class Tasks extends Component {
         this.setState({ postDesc: event.target.value });
     }
 
-    setPriorityStyle = (item) => {
-        switch (item.priority) {
-            case 1:
-                return "low";
-            case 2:
-                return "medium";
-            case 3:
-                return "high";
-            default:
-                return "";
-        }
-    }
-
-    handlePriorityChange = (event) => {
-        this.setState({ postPriority: event.target.value });
-    };
-
-    handleProjectChange = (event) => {
-        this.setState({ postProject: event.target.value });
-    };
-
     // Other helpers
     displayCompleted = (status) => {
         return this.setState({ viewStatus: status });
@@ -120,7 +95,7 @@ class Tasks extends Component {
 
     handleDeleteTask = () => {
         axios
-            .delete(`/api/tasks/${this.state.taskId}/`,
+            .delete(`/api/projects/${this.state.projectId}/`,
                 {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
@@ -133,7 +108,7 @@ class Tasks extends Component {
 
     handleChangeStatus = (item, status) => {
         axios
-            .get(`/calendar/${item.id}/changeStatus/${status}`)
+            .get(`/calendar/${item.id}/changeProjectStatus/${status}`)
             .then((res) => window.location.reload());
     }
 
@@ -164,19 +139,14 @@ class Tasks extends Component {
 
     renderItems = () => {
         const { viewStatus } = this.state;
-
-        if (!this.props.location.todoList) {
-            return;
-        }
-
-        const newItems = this.props.location.todoList.filter(
+        const newItems = this.props.projectList.filter(
             (item) => viewStatus === item.status
         );
 
         return newItems.map((item) => (
             <li
                 key={item.id}
-                className={`list-group-item d-flex justify-content-between align-items-center ${this.setPriorityStyle(item)}`}
+                className="list-group-item d-flex justify-content-between align-items-center"
             >
                 <span className="d-flex col-5">
                     <span
@@ -186,9 +156,6 @@ class Tasks extends Component {
                         <br />
                         <small>{handleDate(item)}</small>
                     </span>
-                    {/* <span className={`urgent ${!item.priority ? "hidden" : ""}`}>
-                        <PriorityHighIcon color="secondary" />
-                    </span> */}
                 </span>
                 <span className="col-5"><small>{item.description}</small></span>
                 <span className="col-1">
@@ -219,6 +186,14 @@ class Tasks extends Component {
                     >
                         <EditIcon />
                     </button>
+                    <Link to={{
+                        pathname: "/tasks",
+                        projectTitle: item.title,
+                        todoList: item.tasks,
+                        projectList: this.props.projectList,
+                    }} className="btn btn-success sm linkButton" title="Go to tasks">
+                        <AssignmentIcon />
+                    </Link>
                     <button
                         className="btn btn-danger sm "
                         onClick={() => this.handleAlertOpen(item)}
@@ -234,7 +209,7 @@ class Tasks extends Component {
     render() {
         return (
             <main className="container">
-                <h1 className="my-4">{`${this.props.location.projectTitle ? this.props.location.projectTitle + ' / ' : ""}`}Tasks</h1>
+                <h1 className="my-4">Projects</h1>
                 <div className="row">
                     <div className="col-md-12 col-sm-10 mx-auto p-0">
                         <div className="card p-3 mb-3">
@@ -258,32 +233,27 @@ class Tasks extends Component {
                     open={this.state.alertOpen}
                     handleClose={this.handleAlertClose}
                     handleSubmit={this.handleDeleteTask}
-                    title="This task will be deleted."
+                    title="This project will be deleted."
                     desc="This action cannot be undone."
                 />
-                <FormDialog
+                <ProjectFormDialog
                     open={this.state.addFormOpen}
                     handleClose={this.handleAddFormClose}
-                    title="Add a New Task"
+                    title="Add a New Project"
                 />
-                <EditFormDialog
+                <EditProjectFormDialog
                     open={this.state.editFormOpen}
                     handleClose={this.handleEditFormClose}
-                    title="Edit Task"
+                    title="Edit Project"
                     postTitle={this.state.postTitle}
                     postDesc={this.state.postDesc}
-                    postPriority={this.state.postPriority}
-                    postProject={this.state.postProject}
-                    handleEditTask={this.handleEditTask}
+                    handleEditProject={this.handleEditProject}
                     handleTitleChange={this.handleTitleChange}
                     handleDescChange={this.handleDescChange}
-                    handlePriorityChange={this.handlePriorityChange}
-                    handleProjectChange={this.handleProjectChange}
-                    projects={this.props.location.projectList}
                 />
             </main>
         );
     }
 }
 
-export default Tasks;
+export default Projects;

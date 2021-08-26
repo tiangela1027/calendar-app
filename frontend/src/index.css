@@ -26,6 +26,10 @@ button {
   margin: 5px;
 }
 
+.linkButton {
+  margin: 5px;
+}
+
 .hidden {
   display: none;
 }
