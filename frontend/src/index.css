@@ -10,10 +10,19 @@ body {
   position: relative;
 }
 
-.urgent {
-  /* padding: 10px; */
+.high {
   color: red;
-  font-size: 1.15em;
+  font-size: 1.2em;
+}
+
+.medium {
+  color: rgba(255, 145, 0, 0.918);
+  font-size: 1em;
+}
+
+.low {
+  color: mediumturquoise;
+  font-size: 0.9em;
 }
 
 button {

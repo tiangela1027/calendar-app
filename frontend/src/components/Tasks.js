@@ -22,7 +22,7 @@ class Tasks extends Component {
             taskId: 0,
             postTitle: "",
             postDesc: "",
-            postChecked: false,
+            postPriority: 0,
             currItem: {}
         };
     }
@@ -51,7 +51,7 @@ class Tasks extends Component {
             currItem: item,
             postTitle: item.title,
             postDesc: item.description,
-            postChecked: item.priority,
+            postPriority: item.priority,
             editFormOpen: true
         });
     };
@@ -68,7 +68,7 @@ class Tasks extends Component {
                     description: this.state.postDesc,
                     create_date: this.state.currItem.create_date,
                     completed: this.state.currItem.completed,
-                    priority: `${this.state.postChecked ? 1 : 0}`
+                    priority: this.state.postPriority
                 },
                 {
                     headers: {
@@ -87,8 +87,21 @@ class Tasks extends Component {
         this.setState({ postDesc: event.target.value });
     }
 
+    setPriorityStyle = (item) => {
+        switch (item.priority) {
+            case 1:
+                return "low";
+            case 2:
+                return "medium";
+            case 3:
+                return "high";
+            default:
+                return "";
+        }
+    }
+
     handlePriorityChange = (event) => {
-        this.setState({ postChecked: event.target.checked });
+        this.setState({ postPriority: event.target.value });
     };
 
     // Other helpers
@@ -165,7 +178,7 @@ class Tasks extends Component {
                     <span
                         className={`col-10 todo-title mr-2`}
                     >
-                        <span className={item.priority ? "urgent" : ""}>{item.title}</span>
+                        <span className={this.setPriorityStyle(item)}>{item.title}</span>
                         <br />
                         <small>{this.handleDate(item)}</small>
                     </span>
@@ -248,7 +261,7 @@ class Tasks extends Component {
                     title="Edit Task"
                     postTitle={this.state.postTitle}
                     postDesc={this.state.postDesc}
-                    postChecked={this.state.postChecked}
+                    postPriority={this.state.postPriority}
                     handleEditTask={this.handleEditTask}
                     handleTitleChange={this.handleTitleChange}
                     handleDescChange={this.handleDescChange}
