@@ -2,8 +2,7 @@ import axios from "axios";
 import React, { Component } from "react";
 import { csrftoken } from "./CSRFToken";
 import AlertDialog from "./AlertDialog";
-import FormDialog from "./FormDialog";
-import EditFormDialog from "./EditFormDialog";
+import TaskFormDialog from "./TaskFormDialog";
 import { handleDate } from "../helpers/Date";
 
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
@@ -26,6 +25,10 @@ class Tasks extends Component {
             postDesc: "",
             postPriority: 0,
             postProject: 0,
+            addTitle: "",
+            addDesc: "",
+            addPriority: 0,
+            addProject: 0,
             currItem: {},
             projectTitle: "All",
             tasks: [],
@@ -63,11 +66,52 @@ class Tasks extends Component {
 
     // Add dialog helpers
     handleAddFormOpen = (item) => {
-        this.setState({ addFormOpen: true });
+        this.setState({ addFormOpen: true, addProject: this.state.projects[0].id });
     };
 
     handleAddFormClose = () => {
         this.setState({ addFormOpen: false });
+    };
+
+    handleProject = () => {
+        return this.props.location.projectId ? this.props.location.projectId : this.state.addProject;
+    }
+
+    handleAddTask = () => {
+        let date = new Date();
+        axios
+            .post(`/api/tasks/`,
+                {
+                    title: this.state.addTitle,
+                    description: this.state.addDesc,
+                    create_date: date,
+                    status: 0,
+                    priority: this.state.addPriority,
+                    project: this.handleProject()
+                },
+                {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrftoken,
+                    }
+                }
+            ).then((res) => window.location.reload());
+    }
+
+    handleAddTitleChange = (event) => {
+        this.setState({ addTitle: event.target.value })
+    }
+
+    handleAddDescChange = (event) => {
+        this.setState({ addDesc: event.target.value });
+    }
+
+    handleAddPriorityChange = (event) => {
+        this.setState({ addPriority: event.target.value });
+    };
+
+    handleAddProjectChange = (event) => {
+        this.setState({ addProject: event.target.value });
     };
 
     // Edit dialog helpers
@@ -286,12 +330,22 @@ class Tasks extends Component {
                     title="This task will be deleted."
                     desc="This action cannot be undone."
                 />
-                <FormDialog
+                <TaskFormDialog
                     open={this.state.addFormOpen}
                     handleClose={this.handleAddFormClose}
                     title="Add a New Task"
+                    postTitle={this.state.addTitle}
+                    postDesc={this.state.addDesc}
+                    postPriority={this.state.addPriority}
+                    postProject={this.handleProject()}
+                    handleTask={this.handleAddTask}
+                    handleTitleChange={this.handleAddTitleChange}
+                    handleDescChange={this.handleAddDescChange}
+                    handlePriorityChange={this.handleAddPriorityChange}
+                    handleProjectChange={this.handleAddProjectChange}
+                    projects={this.state.projects}
                 />
-                <EditFormDialog
+                <TaskFormDialog
                     open={this.state.editFormOpen}
                     handleClose={this.handleEditFormClose}
                     title="Edit Task"
@@ -299,7 +353,7 @@ class Tasks extends Component {
                     postDesc={this.state.postDesc}
                     postPriority={this.state.postPriority}
                     postProject={this.state.postProject}
-                    handleEditTask={this.handleEditTask}
+                    handleTask={this.handleEditTask}
                     handleTitleChange={this.handleTitleChange}
                     handleDescChange={this.handleDescChange}
                     handlePriorityChange={this.handlePriorityChange}

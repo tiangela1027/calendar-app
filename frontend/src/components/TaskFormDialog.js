@@ -11,7 +11,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { FormControl } from '@material-ui/core';
 import { InputLabel } from '@material-ui/core';
 
-export default function FormDialog({
+export default function TaskFormDialog({
     open,
     handleClose,
     title,
@@ -19,7 +19,7 @@ export default function FormDialog({
     postDesc,
     postPriority,
     postProject,
-    handleEditTask,
+    handleTask,
     handleTitleChange,
     handleDescChange,
     handlePriorityChange,
@@ -39,6 +39,10 @@ export default function FormDialog({
     }));
 
     const classes = useStyles();
+
+    const trimTitle = () => {
+        return title.substring(0, title.indexOf(" "));
+    }
 
     return (
         <div>
@@ -106,8 +110,8 @@ export default function FormDialog({
                     <Button onClick={handleClose} color="primary">
                         Cancel
                     </Button>
-                    <Button onClick={handleEditTask} color="primary">
-                        Edit
+                    <Button onClick={handleTask} color="primary">
+                        {trimTitle()}
                     </Button>
                 </DialogActions>
             </Dialog>

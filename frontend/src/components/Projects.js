@@ -191,6 +191,7 @@ class Projects extends Component {
                         projectTitle: item.title,
                         todoList: item.tasks,
                         projectList: this.props.projectList,
+                        projectId: item.id
                     }} className="btn btn-success sm linkButton" title="Go to tasks">
                         <AssignmentIcon />
                     </Link>
@@ -233,8 +234,8 @@ class Projects extends Component {
                     open={this.state.alertOpen}
                     handleClose={this.handleAlertClose}
                     handleSubmit={this.handleDeleteTask}
-                    title="This project will be deleted."
-                    desc="This action cannot be undone."
+                    title="This project and all its tasks will be deleted."
+                    desc="This action cannot be undone. If you want to keep your tasks, please attach them to a different project."
                 />
                 <ProjectFormDialog
                     open={this.state.addFormOpen}
