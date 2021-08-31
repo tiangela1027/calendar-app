@@ -116,19 +116,19 @@ class Projects extends Component {
         return (
             <div className="nav nav-tabs">
                 <span
-                    className={this.state.viewStatus == 0 ? "nav-link active" : "nav-link"}
+                    className={this.state.viewStatus === 0 ? "nav-link active" : "nav-link"}
                     onClick={() => this.displayCompleted(0)}
                 >
                     On Hold
                 </span>
                 <span
-                    className={this.state.viewStatus == 1 ? "nav-link active" : "nav-link"}
+                    className={this.state.viewStatus === 1 ? "nav-link active" : "nav-link"}
                     onClick={() => this.displayCompleted(1)}
                 >
                     In Progress
                 </span>
                 <span
-                    className={this.state.viewStatus == 2 ? "nav-link active" : "nav-link"}
+                    className={this.state.viewStatus === 2 ? "nav-link active" : "nav-link"}
                     onClick={() => this.displayCompleted(2)}
                 >
                     Completed
@@ -160,7 +160,7 @@ class Projects extends Component {
                 <span className="col-5"><small>{item.description}</small></span>
                 <span className="col-1">
                     <button
-                        className={`btn btn-success sm ${this.state.viewStatus == 1 ? "" : "hidden"}`}
+                        className={`btn btn-success sm ${this.state.viewStatus === 1 ? "" : "hidden"}`}
                         onClick={() => this.handleChangeStatus(item, 2)}
                         title="Mark complete"
                     >

@@ -27,7 +27,29 @@ class Tasks extends Component {
             postPriority: 0,
             postProject: 0,
             currItem: {},
+            projectTitle: "All",
+            tasks: [],
+            projects: [],
         };
+    }
+
+    refreshTasksList = () => {
+        axios
+            .get("api/tasks/")
+            .then((res) => this.setState({ tasks: res.data }))
+            .catch((err) => console.log(err));
+    }
+
+    refreshProjectsList = () => {
+        axios
+            .get("api/projects/")
+            .then((res) => this.setState({ projects: res.data }))
+            .catch((err) => console.log(err));
+    }
+
+    componentDidMount = () => {
+        this.refreshTasksList();
+        this.refreshProjectsList();
     }
 
     // Delete dialog helpers
@@ -141,19 +163,19 @@ class Tasks extends Component {
         return (
             <div className="nav nav-tabs">
                 <span
-                    className={this.state.viewStatus == 0 ? "nav-link active" : "nav-link"}
+                    className={this.state.viewStatus === 0 ? "nav-link active" : "nav-link"}
                     onClick={() => this.displayCompleted(0)}
                 >
                     On Hold
                 </span>
                 <span
-                    className={this.state.viewStatus == 1 ? "nav-link active" : "nav-link"}
+                    className={this.state.viewStatus === 1 ? "nav-link active" : "nav-link"}
                     onClick={() => this.displayCompleted(1)}
                 >
                     In Progress
                 </span>
                 <span
-                    className={this.state.viewStatus == 2 ? "nav-link active" : "nav-link"}
+                    className={this.state.viewStatus === 2 ? "nav-link active" : "nav-link"}
                     onClick={() => this.displayCompleted(2)}
                 >
                     Completed
@@ -165,13 +187,17 @@ class Tasks extends Component {
     renderItems = () => {
         const { viewStatus } = this.state;
 
-        if (!this.props.location.todoList) {
-            return;
-        }
+        let newItems = []
 
-        const newItems = this.props.location.todoList.filter(
-            (item) => viewStatus === item.status
-        );
+        if (this.props.location.todoList) {
+            newItems = this.props.location.todoList.filter(
+                (item) => viewStatus === item.status
+            );
+        } else {
+            newItems = this.state.tasks.filter(
+                (item) => viewStatus === item.status
+            );
+        }
 
         return newItems.map((item) => (
             <li
@@ -186,14 +212,11 @@ class Tasks extends Component {
                         <br />
                         <small>{handleDate(item)}</small>
                     </span>
-                    {/* <span className={`urgent ${!item.priority ? "hidden" : ""}`}>
-                        <PriorityHighIcon color="secondary" />
-                    </span> */}
                 </span>
                 <span className="col-5"><small>{item.description}</small></span>
                 <span className="col-1">
                     <button
-                        className={`btn btn-success sm ${this.state.viewStatus == 1 ? "" : "hidden"}`}
+                        className={`btn btn-success sm ${this.state.viewStatus === 1 ? "" : "hidden"}`}
                         onClick={() => this.handleChangeStatus(item, 2)}
                         title="Mark complete"
                     >
@@ -234,7 +257,9 @@ class Tasks extends Component {
     render() {
         return (
             <main className="container">
-                <h1 className="my-4">{`${this.props.location.projectTitle ? this.props.location.projectTitle + ' / ' : ""}`}Tasks</h1>
+                <h1 className="my-4">
+                    {`${this.props.location.projectTitle ? this.props.location.projectTitle : this.state.projectTitle}`} / Tasks
+                </h1>
                 <div className="row">
                     <div className="col-md-12 col-sm-10 mx-auto p-0">
                         <div className="card p-3 mb-3">
@@ -279,7 +304,7 @@ class Tasks extends Component {
                     handleDescChange={this.handleDescChange}
                     handlePriorityChange={this.handlePriorityChange}
                     handleProjectChange={this.handleProjectChange}
-                    projects={this.props.location.projectList}
+                    projects={this.state.projects}
                 />
             </main>
         );

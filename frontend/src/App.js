@@ -10,14 +10,11 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      todoList: [],
-      projectTitle: "All",
       projectList: [],
     };
   }
 
   componentDidMount() {
-    this.refreshTasksList();
     this.refreshProjectsList();
   }
 
@@ -28,13 +25,6 @@ class App extends Component {
       .catch((err) => console.log(err));
   }
 
-  refreshTasksList = () => {
-    axios
-      .get("api/tasks/")
-      .then((res) => this.setState({ todoList: res.data }))
-      .catch((err) => console.log(err));
-  }
-
   render() {
     return (
       <div className="rowSideBySide">
@@ -42,14 +32,7 @@ class App extends Component {
           <Sidebar items={[
             { name: '/home', label: 'Home' },
             { name: '/projects', label: 'Projects' },
-            {
-              name: {
-                pathname: "/tasks",
-                projectTitle: this.state.projectTitle,
-                todoList: this.state.todoList,
-                projectList: this.state.projectList
-              }, label: 'Tasks'
-            },
+            { name: '/tasks', label: 'Tasks' }
           ]} />
           <Switch>
             <Route path="/home"></Route>
